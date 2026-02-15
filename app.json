@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Umeboshi",
-    "slug": "nihonki",
+    "name": "Umeboshi-F",
+    "slug": "frenchumeboshi",
     "version": "1.0.0",
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,14 +32,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.palminski.frenchumeboshi"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.palminski.nihonki",
+      "package": "com.palminski.frenchumeboshi",
       "permissions": [
         "com.android.vending.BILLING"
       ]
