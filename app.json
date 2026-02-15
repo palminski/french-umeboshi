@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "Umeboshi",
+    "slug": "nihonki",
+    "version": "1.0.0",
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "plugins": [
+      [
+        "./plugins/withAnkiModule",
+        [
+          "expo-image-picker",
+          {
+            "photosPermission": "The app accesses your photos to let you share them with your friends."
+          }
+        ]
+      ]
+    ],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#3b0e59"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.palminski.nihonki",
+      "permissions": [
+        "com.android.vending.BILLING"
+      ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "186ea4c4-fa61-4b70-9741-4740109ed993"
+      }
+    }
+  }
+}
