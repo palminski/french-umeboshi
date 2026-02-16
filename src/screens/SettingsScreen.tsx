@@ -105,7 +105,7 @@ export default function SettingsScreen() {
                                 <Ionicons name="help-circle-outline" size={18} color={"#fff"} />
                             </Pressable>
                         </View>
-                        <TextInput className='bg-black border mb-2 shadow-lg shadow-purple-300 border-purple-800 my-1 rounded text-purple-300 placeholder:text-purple-300/50' value={settingForm.insertDeck} onChangeText={(text) => handleFormChange('insertDeck', text)} placeholder='Deck Name (Defaults to Umeboshi)' />
+                        <TextInput className='bg-black border mb-2 shadow-lg shadow-sky-300 border-sky-800 my-1 rounded text-sky-300 placeholder:text-sky-300/50' value={settingForm.insertDeck} onChangeText={(text) => handleFormChange('insertDeck', text)} placeholder='Deck Name (Defaults to Umeboshi)' />
                     </View>
 
                     <View className="mb-3">
@@ -120,7 +120,7 @@ export default function SettingsScreen() {
                         </View>
 
 
-                        <TextInput secureTextEntry={true} className='bg-black border mb-2 shadow-lg shadow-purple-300 border-purple-800 my-1 rounded text-purple-300 placeholder:text-purple-300/50' value={settingForm.apiKey} onChangeText={(text) => handleFormChange('apiKey', text)} placeholder='Personal Api Key' />
+                        <TextInput secureTextEntry={true} className='bg-black border mb-2 shadow-lg shadow-sky-300 border-sky-800 my-1 rounded text-sky-300 placeholder:text-sky-300/50' value={settingForm.apiKey} onChangeText={(text) => handleFormChange('apiKey', text)} placeholder='Personal Api Key' />
                     </View>
 
 
@@ -132,13 +132,13 @@ export default function SettingsScreen() {
                                 </View>
 
                                 <View className="mb-6">
-                                    <Pressable onPress={() => purchaseSubscription()} className="border p-3 bg-purple-800 border-purple-600 rounded flex-row items-center">
+                                    <Pressable onPress={() => purchaseSubscription()} className="border p-3 bg-sky-800 border-sky-600 rounded flex-row items-center">
                                         <Text className="mx-auto text-white">Purchase Subscription ($5.99 / month)</Text>
                                     </Pressable>
                                 </View>
 
                                 <View className="mb-3">
-                                    <Pressable onPress={() => restorePurchase()} className="border p-3 bg-purple-800 border-purple-600 rounded flex-row items-center">
+                                    <Pressable onPress={() => restorePurchase()} className="border p-3 bg-sky-800 border-sky-600 rounded flex-row items-center">
                                         <Text className="mx-auto text-white">Restore Purchase</Text>
                                     </Pressable>
                                 </View>
@@ -148,12 +148,12 @@ export default function SettingsScreen() {
                                 {
                                     !loading &&
                                     <View className="mb-3">
-                                        <Text className="text-purple-400 text-lg">
+                                        <Text className="text-sky-400 text-lg">
                                             You are currently subscribed!
                                         </Text>
 
                                         <Pressable onPress={() => Linking.openURL("https://play.google.com/store/account/subscriptions")}>
-                                            <Text className="underline text-purple-400 text-lg">Manage Subscriptions Here!</Text>
+                                            <Text className="underline text-sky-400 text-lg">Manage Subscriptions Here!</Text>
                                         </Pressable>
                                     </View>
                                 }

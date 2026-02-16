@@ -58,7 +58,7 @@ export default function VocabListScreen() {
                     {
                         loading ?
                             <View>
-                                <Text className="mt-6 text-xl font-semibold text-purple-300/50 mx-auto">Loading</Text>
+                                <Text className="mt-6 text-xl font-semibold text-sky-300/50 mx-auto">Loading</Text>
                             </View>
                             :
                             <>

@@ -5,8 +5,8 @@ import { StyleSheet } from "react-native";
 
 export default function ScreenWrapper({children}: {children: ReactNode}) {
     return (
-        <LinearGradient  colors={['#2c0042', '#220a2e', '#050505']}  className="flex-1  bg-[#112]">
-            <View className="w-full  shadow-lg shadow-purple-300 border-purple-800"></View>
+        <LinearGradient  colors={['#0078b0', '#001c54', '#050505']}  className="flex-1  bg-[#112]">
+            <View className="w-full  shadow-lg shadow-sky-300 border-sky-800"></View>
             {children}
         </LinearGradient>
     )
