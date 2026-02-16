@@ -12,7 +12,7 @@ import ImageView from "react-native-image-viewing";
 import axios from "axios";
 import Purchases from "react-native-purchases";
 
-import { translateImage, translateWord } from "~/utils/aiAPICalls";
+import { translateWord } from "~/utils/aiAPICalls";
 
 import UmeboshiChan from "../assets/UmeboshiChan.svg";
 
@@ -21,9 +21,9 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
 
     const [inputText, setInputText] = useState<string>("");
 
-    const [isPictureMode, setIsPictureMode] = useState<boolean>(true);
+    const [fromFrench, setfromFrench] = useState<boolean>(true);
 
-    const [kanjiObjectArray, setKanjiObjectArray] = useState<Array<any>>([]);
+    const [cardObjectArray, setCardObjectArray] = useState<Array<any>>([]);
 
     const [snappedImages, setSnappedImages] = useState<any[]>([]);
     const [imageViewerVisible, setImageViewerVisible] = useState(false);
@@ -51,112 +51,15 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
 
     const textInputRef = useRef<TextInput>(null);
 
-    async function handleOpenCamera() {
-
-        const key = await loadAPIKeySetting();
-        if ((key == null || key == "")) {
-            Alert.alert("Setup Required", "To start making cards please go to settings and either purchase a subscription or provide an OpenAI API key.")
-            return;
-        }
-
-        const cameraRequestId = `Camera_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-        const permission = await ImagePicker.requestCameraPermissionsAsync();
-        setIsPictureMode(true);
-        if (permission.status !== 'granted') {
-            Alert.alert("You must grant application access to camera to take pictures of text");
-            return;
-        }
-        const result = await ImagePicker.launchCameraAsync({
-            cameraType: ImagePicker.CameraType.back,
-            base64: true,
-            quality: 1,
-            allowsEditing: true,
-            exif: false,
-        });
-        if (!result.canceled) {
-            const asset = result.assets[0];
-
-            setCurrentRequests(prev => ({
-                ...prev,
-                [cameraRequestId]: asset.uri
-            }));
-
-            try {
-
-                let jsonString = "";
-                if (key) {
-                    jsonString = await translateImage(asset.base64);
-                } else {
-                    try {
-                        
-                       
-                        const response = await axios.post(
-                            // Hard Coding While Testing
-                            // `http://10.0.0.187:8000/api/ai_translation/image`,
-                            `https://nihonki-server-udaaiuh2.on-forge.com/api/ai_translation/image`,
-                            { imageBase64: asset.base64},
-                            {});
-                        jsonString = response.data.message;
-                    } catch (error: any) {
-                        
-                        throw error;
-                    }
-                }
-
-                setCurrentRequests(prev => {
-                    const { [cameraRequestId]: _, ...rest } = prev
-                    return rest
-                });
-                setSnappedImages(prevItems => [{ uri: asset.uri }, ...prevItems])
-
-
-                let cardObjectArray = [];
-
-                if (jsonString) {
-                    cardObjectArray = JSON.parse(jsonString);
-                }
-                if (!Array.isArray(cardObjectArray)) {
-                    return;
-                }
-
-                let vocabList = await loadVocabList()
-                cardObjectArray.forEach(cardObject => {
-                    const { valid, missing } = ValidateCardData(cardObject);
-                    if (!valid) {
-                        return;
-                    }
-                    vocabList[cardObject.kanji + "_" + cardObject.kana] = cardObject;
-                });
-                await updateVocabList(vocabList);
-
-
-                setKanjiObjectArray(prev => {
-                    const filteredPrev = prev.filter(
-                        kanjiObjectArray => !cardObjectArray.some(cardObject => cardObject.kanji === kanjiObjectArray.kanji)
-                    );
-                    return [...cardObjectArray, ...filteredPrev]
-                });
-
-            } catch (error: any) {
-                setCurrentRequests(prev => {
-                    const { [cameraRequestId]: _, ...rest } = prev
-                    return rest
-                });
-                alert(error?.message);
-            }
-        }
-    }
-
     const handleTextSubmit = async (textToSend: string) => {
-        setIsPictureMode(true);
 
         if (textToSend == null || textToSend == "") return;
 
-        const key = await loadAPIKeySetting();
-        if ((key == null || key == "")) {
-            Alert.alert("Setup Required", "To start making cards please go to settings and either purchase a subscription or provide an OpenAI API key.")
-            return;
-        }
+        // const key = await loadAPIKeySetting();
+        // if ((key == null || key == "")) {
+        //     Alert.alert("Setup Required", "To start making cards please go to settings and either purchase a subscription or provide an OpenAI API key.")
+        //     return;
+        // }
 
         try {
             setInputText("");
@@ -168,30 +71,13 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
             let jsonString = "";
 
             // Make request from app or from server depending on if user input a key
-            if (key) {
-                jsonString = await translateWord(textToSend);
-            } else {
-                try {
-                    
-                    
-                    const response = await axios.post(
-                        // `http://10.0.0.187:8000/api/ai_translation/single_word`,
-                        `https://nihonki-server-udaaiuh2.on-forge.com/api/ai_translation/single_word`,
-                        { wordToTranslate: textToSend },
-                        {});
-                    jsonString = response.data.message;
-                } catch (error: any) {
-                    
-                    throw error;
-                }
-            }
-
+            
+            jsonString = await translateWord(textToSend, fromFrench);
 
             setCurrentRequests(prev => {
                 const { [textToSend]: _, ...rest } = prev
                 return rest
             });
-
 
             if (jsonString !== null) {
                 //Validate Response
@@ -202,14 +88,10 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
                     return;
                 }
                 //Add Vocab Word To VOcab Word Array
-                setKanjiObjectArray(prev => {
-                    const filtered = prev.filter(k => k.kanji !== cardObject.kanji);
+                setCardObjectArray(prev => {
+                    const filtered = prev.filter(card => card.wordFrench !== cardObject.wordFrench);
                     return [cardObject, ...filtered]
                 })
-                // Update App Vocab List
-                let vocabList = await loadVocabList()
-                vocabList[cardObject.kanji + "_" + cardObject.kana] = cardObject;
-                updateVocabList(vocabList);
             }
 
         } catch (error: any) {
@@ -225,13 +107,9 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
         setInputText(value);
     }
 
-    const handleEnterText = async () => {
-        const key = await loadAPIKeySetting();
-        if ((key == null || key == "")) {
-            Alert.alert("Setup Required", "To start making cards please go to settings and either purchase a subscription or provide an OpenAI API key.")
-            return;
-        }
-        setIsPictureMode(false);
+    const handleEnterText = async (shouldSetToFrench: boolean) => {
+        
+        setfromFrench(shouldSetToFrench);
 
 
         textInputRef.current?.blur();
@@ -242,14 +120,10 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
 
     function ValidateCardData(data: any): { valid: boolean; missing: string[] } {
         let requiredFields = [
-            "kanji",
-            "kana",
-            "furigana",
-            "meaning",
+            "wordEnglish",
+            "wordFrench",
             "partOfSpeech",
-            "exampleSentenceKanji",
-            "exampleSentenceFurigana",
-            "exampleSentenceKana",
+            "exampleSentenceFrench",
             "exampleSentenceEnglish"
         ]
         const missing = requiredFields.filter((key) => !(key in data) || data[key] === "");
@@ -271,43 +145,16 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
                 >
 
                     {/* INPUT AND STATUS BOX */}
-                    {
-                        isPictureMode ?
-                            <View className="flex flex-row bg-black rounded min-h-[100px] border mb-2 shadow-lg shadow-sky-300 border-sky-800">
-                                <ScrollView horizontal className="">
-                                    {
-                                        snappedImages.length > 0 ?
-                                            snappedImages.map((image, index) => (
-                                                <Pressable key={index} onPress={() => { setImageViewerVisible(true); setImageIndex(index) }}>
-                                                    <Image source={{ uri: image.uri }} style={{ width: 100, height: 100 }} />
-
-                                                </Pressable>
-                                            ))
-                                            :
-                                            <Text className="text-sky-400/50 text-lg mt-auto  pl-3 pb-2">Scanned Images Will Appear Here...</Text>
-                                    }
-                                    <ImageView
-                                        images={snappedImages}
-                                        imageIndex={imageIndex}
-                                        visible={imageViewerVisible}
-                                        onRequestClose={() => setImageViewerVisible(false)}
-                                    />
-                                </ScrollView>
-                            </View>
-                            :
                             <View className="flex flex-row bg-black rounded min-h-[100px] border mb-2 shadow-lg shadow-sky-300 border-sky-800">
                                 <View className="border border-r-sky-600 w-full flex flex-row">
-                                    <TextInput onSubmitEditing={() => handleTextSubmit(inputText)} ref={textInputRef} className='border text-lg text-sky-300 placeholder:text-sky-300/50 rounded m-2 flex-1' value={inputText} onChangeText={(text) => HandleFormChange(text)} placeholder='Text Here' />
+                                    <TextInput onSubmitEditing={() => handleTextSubmit(inputText)} ref={textInputRef} className='border text-lg text-sky-300 placeholder:text-sky-300/50 rounded m-2 flex-1' value={inputText} onChangeText={(text) => HandleFormChange(text)} placeholder={fromFrench ? "Enter French Word" : "Enter English Word"} />
                                     <View className="flex justify-end">
                                         <Pressable onPress={() => handleTextSubmit(inputText)} className="m-2 border p-2 bg-sky-800 border-sky-600 rounded flex-row items-center">
-                                            <Text className=" text-white">Submit</Text>
+                                            <Text className=" text-white">{fromFrench ? "Submit French Word" : "Submit English Word"}</Text>
                                         </Pressable>
                                     </View>
                                 </View>
                             </View>
-                    }
-
-
                     {
 
                         Object.entries(currentRequests).map(([key, value]) => (
@@ -337,11 +184,11 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
 
                     {/* Kanji List */}
                     {
-                        (kanjiObjectArray.length > 0 || Object.entries(currentRequests).length > 0) ?
+                        (cardObjectArray.length > 0 || Object.entries(currentRequests).length > 0) ?
                             <>
-                                {kanjiObjectArray.map((kanji: any, index: number) => (
-                                    <View key={kanji.kanji}>
-                                        <VocabCard vocabWord={kanji} />
+                                {cardObjectArray.map((card: any, index: number) => (
+                                    <View key={card.wordFrench}>
+                                        <VocabCard vocabWord={card} />
                                     </View>
                                 ))}
                             </>
@@ -367,8 +214,7 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
 
 
                 </ScrollView>
-                {/* <Image source={require("../assets/UmeboshiChan2.png")} style={{ width: 200, height: 200, opacity: 0.5, position: "absolute", bottom: 0, zIndex:10 }} /> */}
-                {/* <UmeboshiChan width={200} height={200} style={{position: "absolute", bottom: 0, left:15, zIndex:10}}></UmeboshiChan> */}
+                <UmeboshiChan width={200} height={200} style={{position: "absolute", bottom: 0, left:15, zIndex:10}}></UmeboshiChan>
 
                 <LinearGradient
                     style={{ position: 'absolute', bottom: 0, width: "100%", height: 50, zIndex: 20 }}
@@ -380,24 +226,26 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
             {/* Bottom Menu */}
             <View className="relative bg-transparent">
                 <View className="flex-row justify-around items-end py-1 bg-[#000000]">
-                    <Pressable onPress={() => { navigation.navigate("Vocab List") }} className="items-center w-1/3">
-                        <Ionicons name="list" size={30} color={"#fff"} />
-                        <Text className="text-white text-xs mt-1">Vocab List</Text>
+                    <Pressable onPress={()=>handleEnterText(false)} className="items-center w-1/3">
+                            <Text style={{ fontSize: 30 }}>🇬🇧</Text>
+                        
+                        <Text className="text-white text-xs mt-1">From English</Text>
                     </Pressable>
-                    <View className="items-center w-1/3 relative">
+                    {/* <View className="items-center w-1/3 relative">
                         <Pressable onPress={handleOpenCamera} className="">
                             <Ionicons name="camera" size={50} color={"#fff"} />
                             
 
                         </Pressable>
                         <Text className="text-white text-xs mt-1">Scan Text</Text>
-                    </View>
+                    </View> */}
                     <View className="items-center w-1/3 relative">
-                        <Pressable onPress={handleEnterText}>
-                            <Ionicons name="create-outline" size={30} color={"#fff"} />
+                        <Pressable onPress={()=>handleEnterText(true)}>
+                            <Text style={{ fontSize: 30 }}>🇫🇷</Text>
+
                             
                         </Pressable>
-                        <Text className="text-white text-xs mt-1">Enter Word</Text>
+                        <Text className="text-white text-xs mt-1">From French</Text>
                     </View>
                 </View>
             </View>

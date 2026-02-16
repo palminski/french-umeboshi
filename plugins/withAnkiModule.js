@@ -14,7 +14,7 @@ module.exports = function withAnkiModule(config) {
             const srcDir = path.join(projectRoot, 'android-custom');
             const destDir = path.join(
                 modConfig.modRequest.platformProjectRoot,
-                'app/src/main/java/com/palminski/nihonki'
+                'app/src/main/java/com/palminski/frenchumeboshi'
             );
 
             if (fs.existsSync(srcDir)) {
@@ -39,16 +39,16 @@ module.exports = function withAnkiModule(config) {
         (modConfig) => {
             const mainAppPath = path.join(
                 modConfig.modRequest.platformProjectRoot,
-                "app/src/main/java/com/palminski/nihonki/MainApplication.kt"
+                "app/src/main/java/com/palminski/frenchumeboshi/MainApplication.kt"
             );
 
             if(fs.existsSync(mainAppPath)) {
                 let contents = fs.readFileSync(mainAppPath, "utf8");
 
-                if(!contents.includes("import com.palminski.nihonki.AnkiPackage")) {
+                if(!contents.includes("import com.palminski.frenchumeboshi.AnkiPackage")) {
                     contents = contents.replace(
                         /import com\.facebook\.react\.defaults\.DefaultReactNativeHost/,
-                        (match) => `${match}\nimport com.palminski.nihonki.AnkiPackage`
+                        (match) => `${match}\nimport com.palminski.frenchumeboshi.AnkiPackage`
                     );
                 }
 
@@ -86,7 +86,7 @@ module.exports = function withAnkiModule(config) {
         const contents = modConfig.modResults.contents;
 
         if(!contents.includes('new AnkiPackage()')) {
-            const updated = contents.replace('import java.util.List;', 'import java.util.List;\nimport com.palminski.nihonki.AnkiPackage;')
+            const updated = contents.replace('import java.util.List;', 'import java.util.List;\nimport com.palminski.frenchumeboshi.AnkiPackage;')
             .replace(
                 /(return Arrays\.asList\([^)]*)\)/,
                 `$1, new AnkiPackage())`
