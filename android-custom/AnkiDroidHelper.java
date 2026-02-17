@@ -1,4 +1,4 @@
-package com.palminski.nihonki;
+package com.palminski.frenchumeboshi;
 
 import android.content.Context;
 import android.os.Build;

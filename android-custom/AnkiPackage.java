@@ -1,4 +1,4 @@
-package com.palminski.nihonki;
+package com.palminski.frenchumeboshi;
 
 import java.util.ArrayList;
 import java.util.Collections;

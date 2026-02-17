@@ -5,20 +5,14 @@ import { loadDeckSetting, updateDeckSetting, loadAPIKeySetting, updateAPIKeySett
 import { useFocusEffect } from "@react-navigation/native";
 import LinearGradient from "react-native-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { loadVocabList } from "~/utils/asyncStorageManager";
-import axios from "axios";
-import Purchases from 'react-native-purchases';
-import { attemptToResoreSubscription, getIsUserSubscribed, promptUserSubscription } from "~/utils/subscriptionMethods";
+
 import { AppContext } from "App";
 
 export default function SettingsScreen() {
-    const appContext = useContext(AppContext);
-    if (!appContext) return null;
-    const { userData, setUserData } = appContext;
+    
 
     const [loading, setLoading] = useState(false);
 
-    const [debugResponse, setDebugResponse] = useState("");
 
     const [settingForm, setSettingsForm] = useState({
         insertDeck: "",
@@ -67,7 +61,7 @@ export default function SettingsScreen() {
 
         }
         try {
-            promptUserSubscription();
+            
             setLoading(false);
         } catch (error: any) {
             setLoading(false);
@@ -75,16 +69,7 @@ export default function SettingsScreen() {
         }
     }
 
-    const purchaseSubscription = async () => {
-        let userSubscribed = await promptUserSubscription();
-        setUserData({ ...userData, isSubscribed: userSubscribed });
-    }
-
-    const restorePurchase = async () => {
-        let userSubscribed = await attemptToResoreSubscription();
-        setUserData({ ...userData, isSubscribed: userSubscribed });
-
-    }
+   
 
     return (
         <ScreenWrapper>
@@ -105,71 +90,20 @@ export default function SettingsScreen() {
                                 <Ionicons name="help-circle-outline" size={18} color={"#fff"} />
                             </Pressable>
                         </View>
-                        <TextInput className='bg-black border mb-2 shadow-lg shadow-purple-300 border-purple-800 my-1 rounded text-purple-300 placeholder:text-purple-300/50' value={settingForm.insertDeck} onChangeText={(text) => handleFormChange('insertDeck', text)} placeholder='Deck Name (Defaults to Umeboshi)' />
+                        <TextInput className='bg-black border mb-2 shadow-lg shadow-sky-300 border-sky-800 my-1 rounded text-sky-300 placeholder:text-sky-300/50' value={settingForm.insertDeck} onChangeText={(text) => handleFormChange('insertDeck', text)} placeholder='Deck Name (Defaults to Umeboshi)' />
                     </View>
 
                     <View className="mb-3">
-
                         <View className="flex-row items-center">
                             <Text className="text-white text-lg mr-2">
-                                OpenAi API Key
+                                Secret Password
                             </Text>
-                            <Pressable onPress={() => Alert.alert("OpenAi API Key", "If you have your own API key for open AI you can use it instead of a subscription. Your key is never sent to our servers. It is stored on your device and used to communicate with OpenAi directly.")} className="items-center">
+                            <Pressable onPress={() => Alert.alert("Secret Password to stop just anyone from accessing my server. Ask Will for this.")} className="items-center">
                                 <Ionicons name="help-circle-outline" size={18} color={"#fff"} />
                             </Pressable>
                         </View>
-
-
-                        <TextInput secureTextEntry={true} className='bg-black border mb-2 shadow-lg shadow-purple-300 border-purple-800 my-1 rounded text-purple-300 placeholder:text-purple-300/50' value={settingForm.apiKey} onChangeText={(text) => handleFormChange('apiKey', text)} placeholder='Personal Api Key' />
+                        <TextInput secureTextEntry={true}  className='bg-black border mb-2 shadow-lg shadow-sky-300 border-sky-800 my-1 rounded text-sky-300 placeholder:text-sky-300/50' value={settingForm.apiKey} onChangeText={(text) => handleFormChange('apiKey', text)} placeholder='Password' />
                     </View>
-
-
-                    {
-                        !userData.isSubscribed ?
-                            <>
-                                <View className="mx-auto mb-3">
-                                    <Ionicons name="ellipsis-horizontal-outline" size={50} color={"#fff"} />
-                                </View>
-
-                                <View className="mb-6">
-                                    <Pressable onPress={() => purchaseSubscription()} className="border p-3 bg-purple-800 border-purple-600 rounded flex-row items-center">
-                                        <Text className="mx-auto text-white">Purchase Subscription ($5.99 / month)</Text>
-                                    </Pressable>
-                                </View>
-
-                                <View className="mb-3">
-                                    <Pressable onPress={() => restorePurchase()} className="border p-3 bg-purple-800 border-purple-600 rounded flex-row items-center">
-                                        <Text className="mx-auto text-white">Restore Purchase</Text>
-                                    </Pressable>
-                                </View>
-                            </>
-                            :
-                            <>
-                                {
-                                    !loading &&
-                                    <View className="mb-3">
-                                        <Text className="text-purple-400 text-lg">
-                                            You are currently subscribed!
-                                        </Text>
-
-                                        <Pressable onPress={() => Linking.openURL("https://play.google.com/store/account/subscriptions")}>
-                                            <Text className="underline text-purple-400 text-lg">Manage Subscriptions Here!</Text>
-                                        </Pressable>
-                                    </View>
-                                }
-                            </>
-                    }
-
-
-
-                    {
-                        debugResponse &&
-                        <Text className="text-white">
-                            Debug Response:{'\n'}
-                            {debugResponse}
-                        </Text>
-                    }
-
 
                 </ScrollView>
                 <LinearGradient
