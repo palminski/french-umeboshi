@@ -1,38 +1,25 @@
 import { loadDeckSetting, updateDeckSetting, loadAPIKeySetting, updateAPIKeySetting } from "~/utils/settingsManager";
 import { imageInstructionText, singleWordInstructionText, systemInstructionText } from "./aiInstructions";
 import OpenAI from "openai";
+import axios from "axios";
 
-export async function translateWord(word, isFrench) {
-
-    return JSON.stringify(
-        {
-            wordEnglish: "English",
-            wordFrench: "French",
-            partOfSpeech: "noun",
-            exampleSentenceFrench: "Example French",
-            exampleSentenceEnglish: "Example English"
-        }
-    )
-
-    const key = await loadAPIKeySetting();
+export async function translateWord(textToSend) {
+    console.log("here");
     try {
-        const openai = new OpenAI({
-            apiKey: `${key}`
-        });
-
-        const response = await openai.responses.create({
-            model: "gpt-4o-mini",
-            input: [
-                { role: "system", content: systemInstructionText },
-                { role: "system", content: singleWordInstructionText },
-                { role: "user", content: word },
-            ],
-        });
-
-        const jsonString = response.output_text?.trim();
+        const key = await loadAPIKeySetting();
+        const response = await axios.post(
+            // `http://10.0.2.2:8000/api/french_ai_translation/single_word`,
+            `https://nihonki-server-udaaiuh2.on-forge.com/api/french_ai_translation/single_word`,
+            { wordToTranslate: textToSend },
+            {
+                headers: {
+                    Authorization: `Bearer ${key}`,
+                },
+            });
+        const jsonString = response.data.message;
         return jsonString;
     } catch (error) {
-        if (error?.message && error?.message.toLowerCase().includes('incorrect api key')) {
+        if (error.response?.status == 403 || error?.message && error?.message.toLowerCase().includes('incorrect api key')) {
             throw new Error(
                 "The API key sent to OpenAi was incorrect. Please input the correct key in this app's settings"
             )

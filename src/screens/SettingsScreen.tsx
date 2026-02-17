@@ -26,10 +26,11 @@ export default function SettingsScreen() {
                 setLoading(true);
 
                 const deckSetting = await loadDeckSetting();
-                // const apiKeySetting = await loadAPIKeySetting();
+                const apiKeySetting = await loadAPIKeySetting();
                 setSettingsForm({
                     ...settingForm,
                     insertDeck: deckSetting != null ? deckSetting : "",
+                    apiKey: apiKeySetting != null ? apiKeySetting : "",
                 });
 
 
@@ -89,7 +90,19 @@ export default function SettingsScreen() {
                                 <Ionicons name="help-circle-outline" size={18} color={"#fff"} />
                             </Pressable>
                         </View>
-                        <TextInput className='bg-black border mb-2 shadow-lg shadow-sky-300 border-sky-800 my-1 rounded placeholder:text-sky-300/50' value={settingForm.insertDeck} onChangeText={(text) => handleFormChange('insertDeck', text)} placeholder='Deck Name (Defaults to Umeboshi)' />
+                        <TextInput className='bg-black border mb-2 shadow-lg shadow-sky-300 border-sky-800 my-1 rounded text-sky-300 placeholder:text-sky-300/50' value={settingForm.insertDeck} onChangeText={(text) => handleFormChange('insertDeck', text)} placeholder='Deck Name (Defaults to Umeboshi)' />
+                    </View>
+
+                    <View className="mb-3">
+                        <View className="flex-row items-center">
+                            <Text className="text-white text-lg mr-2">
+                                Secret Password
+                            </Text>
+                            <Pressable onPress={() => Alert.alert("Secret Password to stop just anyone from accessing my server. Ask Will for this.")} className="items-center">
+                                <Ionicons name="help-circle-outline" size={18} color={"#fff"} />
+                            </Pressable>
+                        </View>
+                        <TextInput secureTextEntry={true}  className='bg-black border mb-2 shadow-lg shadow-sky-300 border-sky-800 my-1 rounded text-sky-300 placeholder:text-sky-300/50' value={settingForm.apiKey} onChangeText={(text) => handleFormChange('apiKey', text)} placeholder='Password' />
                     </View>
 
                 </ScrollView>

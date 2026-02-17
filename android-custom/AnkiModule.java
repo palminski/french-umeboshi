@@ -206,7 +206,7 @@ public class AnkiModule extends ReactContextBaseJavaModule {
             <style>
             body {
                 background-size: cover;
-                background: linear-gradient(to top, #1a3946 1%, rgba(0,0,0,0) 99%);
+                background: linear-gradient(to top, #001c54 1%, rgba(0,0,0,0) 99%);
                 background-repeat: no-repeat;
                 background-position: bottom;
             }

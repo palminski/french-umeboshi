@@ -72,7 +72,7 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
 
             // Make request from app or from server depending on if user input a key
             
-            jsonString = await translateWord(textToSend, fromFrench);
+            jsonString = await translateWord(textToSend);
 
             setCurrentRequests(prev => {
                 const { [textToSend]: _, ...rest } = prev
@@ -161,7 +161,7 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
                             <View key={key} className="my-2  shadow-sky-800 border border-sky-300 p-3 bg-black/20  rounded">
                                 <View className="flex flex-row justify-start items-center ">
                                     <View>
-                                        <ActivityIndicator size={50} color={'#A855F7'} />
+                                        <ActivityIndicator size={50} color={'#7dd3fc'} />
                                     </View>
                                     <View className="mx-auto">
                                         {
@@ -226,27 +226,27 @@ export default function HomeScreen({ navigation }: { navigation: NavigationProp<
             {/* Bottom Menu */}
             <View className="relative bg-transparent">
                 <View className="flex-row justify-around items-end py-1 bg-[#000000]">
-                    <Pressable onPress={()=>handleEnterText(false)} className="items-center w-1/3">
+                    {/* <Pressable onPress={()=>handleEnterText(false)} className="items-center w-1/3">
                             <Text style={{ fontSize: 30 }}>🇬🇧</Text>
                         
                         <Text className="text-white text-xs mt-1">From English</Text>
-                    </Pressable>
-                    {/* <View className="items-center w-1/3 relative">
-                        <Pressable onPress={handleOpenCamera} className="">
-                            <Ionicons name="camera" size={50} color={"#fff"} />
+                    </Pressable> */}
+                    <View className="items-center w-1/3 relative">
+                        <Pressable onPress={() => handleEnterText(true)} className="">
+                           <Text style={{ fontSize: 50 }}>🇫🇷</Text>
                             
 
                         </Pressable>
-                        <Text className="text-white text-xs mt-1">Scan Text</Text>
-                    </View> */}
-                    <View className="items-center w-1/3 relative">
+                        <Text className="text-white text-xs mt-1">Enter Text</Text>
+                    </View>
+                    {/* <View className="items-center w-1/3 relative">
                         <Pressable onPress={()=>handleEnterText(true)}>
                             <Text style={{ fontSize: 30 }}>🇫🇷</Text>
 
                             
                         </Pressable>
                         <Text className="text-white text-xs mt-1">From French</Text>
-                    </View>
+                    </View> */}
                 </View>
             </View>
 

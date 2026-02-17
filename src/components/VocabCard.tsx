@@ -72,7 +72,7 @@ export default function VocabCard({ vocabWord, hasBeenSent = false }: VocabCardP
                         :
                         <Pressable className="border p-2 border-sky-800 bg-sky-950 rounded flex-row items-center">
                             <Text className=" text-sky-400">Card Added!</Text>
-                            <Ionicons className="ml-2" name="checkmark-outline" size={12} color={"#C084FC"} />
+                            <Ionicons className="ml-2" name="checkmark-outline" size={12} color={"#38bdf8"} />
                         </Pressable>
                 }
             </View>
