@@ -2,6 +2,7 @@ const {
     withDangerousMod,
     withMainApplication,
     withAppBuildGradle,
+    withAndroidManifest,
 } = require('@expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
@@ -18,16 +19,15 @@ module.exports = function withAnkiModule(config) {
             );
 
             if (fs.existsSync(srcDir)) {
-                fs.mkdirSync(destDir, {recursive: true});
-                for(const file of fs.readdirSync(srcDir)) {
+                fs.mkdirSync(destDir, { recursive: true });
+                for (const file of fs.readdirSync(srcDir)) {
                     const from = path.join(srcDir, file);
                     const to = path.join(destDir, file);
-                    fs.copyFileSync(from,to);
+                    fs.copyFileSync(from, to);
                 }
                 console.log(":) - SUCCEEDED IN COPYING ANKI JAVA FILES TO ANDROID PROJECT");
             }
-            else
-            {
+            else {
                 console.log("X - FAILED IN COPYING ANKI JAVA FILES TO ANDROID PROJECT");
             }
             return modConfig;
@@ -42,17 +42,17 @@ module.exports = function withAnkiModule(config) {
                 "app/src/main/java/com/palminski/frenchumeboshi/MainApplication.kt"
             );
 
-            if(fs.existsSync(mainAppPath)) {
+            if (fs.existsSync(mainAppPath)) {
                 let contents = fs.readFileSync(mainAppPath, "utf8");
 
-                if(!contents.includes("import com.palminski.frenchumeboshi.AnkiPackage")) {
+                if (!contents.includes("import com.palminski.frenchumeboshi.AnkiPackage")) {
                     contents = contents.replace(
                         /import com\.facebook\.react\.defaults\.DefaultReactNativeHost/,
                         (match) => `${match}\nimport com.palminski.frenchumeboshi.AnkiPackage`
                     );
                 }
 
-                if(!contents.includes("packages.add(AnkiPackage())")) {
+                if (!contents.includes("packages.add(AnkiPackage())")) {
                     contents = contents.replace(
                         /(PackageList\(this\)\.packages\.apply\s*{)/,
                         `$1 \n   add(AnkiPackage())`
@@ -61,15 +61,14 @@ module.exports = function withAnkiModule(config) {
                 fs.writeFileSync(mainAppPath, contents);
                 console.log(":) - SUCCEEDED IN COPYING packages.add(AnkiPackage()) to MainApplication.kt");
             }
-            else
-            {
+            else {
                 console.log("X - FAILED IN COPYING packages.add(AnkiPackage()) to MainApplication.kt");
             }
             return modConfig;
         }
     ]);
 
-    
+
 
     config = withAppBuildGradle(config, (modConfig) => {
         if (!modConfig.modResults.contents.includes('implementation "com.ichi2.anki:api')) {
@@ -85,16 +84,36 @@ module.exports = function withAnkiModule(config) {
     config = withMainApplication(config, (modConfig) => {
         const contents = modConfig.modResults.contents;
 
-        if(!contents.includes('new AnkiPackage()')) {
+        if (!contents.includes('new AnkiPackage()')) {
             const updated = contents.replace('import java.util.List;', 'import java.util.List;\nimport com.palminski.frenchumeboshi.AnkiPackage;')
-            .replace(
-                /(return Arrays\.asList\([^)]*)\)/,
-                `$1, new AnkiPackage())`
-            );
+                .replace(
+                    /(return Arrays\.asList\([^)]*)\)/,
+                    `$1, new AnkiPackage())`
+                );
             modConfig.modResults.contents = updated;
             console.log('REGISTERED ANKIPACKAGE IN MAINAPPLICATION.JAVA');
         }
         return modConfig;
     });
+
+    config = withAndroidManifest(config, (modConfig) => {
+        const m = modConfig.modResults.manifest;
+
+        // Ensure exactly one <queries>
+        m.queries = m.queries || [{}];
+        if (m.queries.length === 0) m.queries = [{}];
+
+        const q = m.queries[0];
+        q.package = q.package || [];
+        q.intent = q.intent || [];
+
+        const hasPkg = q.package.some(p => p?.$?.["android:name"] === "com.ichi2.anki");
+        if (!hasPkg) {
+            q.package.push({ $: { "android:name": "com.ichi2.anki" } });
+        }
+
+        return modConfig;
+    });
+
     return config;
 }
